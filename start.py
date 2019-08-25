@@ -5,32 +5,24 @@ stdscr = curses.initscr()
 stdscr.keypad(True)
 curses.noecho()
 curses.cbreak()
-curses.curs_set(True)
+curses.curs_set(False)
 
 def main(stdscr):
     # Clear the screen
     stdscr.clear()
 
-    stdscr.refresh()
-
-    # Add a string
-    # stdscr.addstr('this is a sample string lelelelele')
-
-    # # Move cursor
-    # stdscr.move(10, 10)
-
-    # stdscr.addstr('i have moved')
-
-    # stdscr.getkey()
+    typed_str = ''
 
     while True:
         key = stdscr.getkey()
 
         if (key == 'KEY_BACKSPACE'):
-            stdscr.delch(0, 0)
+           typed_str = typed_str[:-1]
         else:
-            stdscr.addstr(key)
+            typed_str += key
 
+        stdscr.clear()
+        stdscr.addstr(5, 5, typed_str)
         stdscr.refresh()
 
 wrapper(main)

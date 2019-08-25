@@ -11,18 +11,20 @@ def main(stdscr):
     # Clear the screen
     stdscr.clear()
 
-    typed_str = ''
+    # Keep track of (y, x) coordinates
+    positions = []
 
     while True:
         key = stdscr.getkey()
 
         if (key == 'KEY_BACKSPACE'):
-           typed_str = typed_str[:-1]
+            if (len(positions) > 0):
+                (previous_pos_y, previous_pos_x) = positions.pop()
+                stdscr.delch(previous_pos_y, previous_pos_x)
         else:
-            typed_str += key
+            positions.append(stdscr.getyx())
+            stdscr.addstr(key)
 
-        stdscr.clear()
-        stdscr.addstr(5, 5, typed_str)
         stdscr.refresh()
 
 wrapper(main)

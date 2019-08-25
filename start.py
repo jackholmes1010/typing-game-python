@@ -55,14 +55,15 @@ def main(stdscr):
             if (len(key) > 1):
                 continue
 
-            # All characters have been typed
-            if (len(sentence) == 0):
-                break
 
             positions.append(stdscr.getyx())
 
             # Check if character was typed correctly
             if (incorrectly_typed_character_count == 0 and key == next_char):
+                # All characters have been typed
+                if (len(sentence) == 0):
+                    break
+
                 stdscr.addstr(key, curses.A_BOLD)
                 next_char = sentence.pop()
                 correctly_typed_character_count += 1

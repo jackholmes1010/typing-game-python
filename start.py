@@ -52,19 +52,23 @@ def main(stdscr):
                     stdscr.delch(previous_pos_y, previous_pos_x)
 
         else:
+            if (len(key) > 1):
+                continue
+
             # All characters have been typed
             if (len(sentence) == 0):
                 break
 
             positions.append(stdscr.getyx())
-            stdscr.addstr(key)
 
             # Check if character was typed correctly
             if (incorrectly_typed_character_count == 0 and key == next_char):
+                stdscr.addstr(key, curses.A_BOLD)
                 next_char = sentence.pop()
                 correctly_typed_character_count += 1
                 update_correct_progress()
             else:
+                stdscr.addstr(key, curses.A_UNDERLINE)
                 incorrectly_typed_character_count += 1
                 update_incorrect_progress()
 

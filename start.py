@@ -59,9 +59,7 @@ def main(stdscr):
             # Remove previous character
             (previous_pos_y, previous_pos_x) = cursor_positions.pop()
             overwritten_char = overwritten_chars.pop()
-            sentence_window.addstr(
-                previous_pos_y, previous_pos_x, overwritten_char
-            )
+            sentence_window.addstr(previous_pos_y, previous_pos_x, overwritten_char)
             sentence_window.move(previous_pos_y, previous_pos_x)
 
             # If there are incorrect characters on
@@ -75,9 +73,7 @@ def main(stdscr):
         else:
             # Keep track of characters that have been overwritten
             (current_pos_y, current_pos_x) = sentence_window.getyx()
-            char_at_cursor = sentence_window.instr(
-                current_pos_y, current_pos_x, 1
-            )
+            char_at_cursor = sentence_window.instr(current_pos_y, current_pos_x, 1)
             cursor_positions.append((current_pos_y, current_pos_x))
             overwritten_chars.append(char_at_cursor)
 

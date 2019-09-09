@@ -1,7 +1,7 @@
 class Sentence:
     def __init__(self):
-        self.original_sentence = list(self.generate_sentence())
-        self.sentence = self.original_sentence.copy()
+        self.original_sentence = self.generate_sentence()
+        self.sentence = list(self.original_sentence)
         self.index = -1
 
     def next_char(self):

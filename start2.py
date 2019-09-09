@@ -1,33 +1,12 @@
 import curses
 from curses import wrapper
+from Sentence import Sentence
 
 stdscr = curses.initscr()
 stdscr.keypad(True)
 curses.noecho()
 curses.cbreak()
 curses.curs_set(False)
-
-
-class Sentence:
-    def __init__(self):
-        self.original_sentence = list(self.generate_sentence())
-        self.sentence = self.original_sentence.copy()
-        self.sentence.reverse()
-
-    def get_next_char(self):
-        if (len(self.sentence) > 0):
-            return self.sentence.pop()
-
-        return None
-
-    def has_more_chars(self):
-        return (len(self.sentence) > 0)
-
-    def get_sentence(self):
-        return self.original_sentence
-
-    def generate_sentence(self):
-        return "Hello World!"
 
 
 def main(stdscr):
@@ -44,29 +23,41 @@ def main(stdscr):
     incorrect_characters_on_screen = 0
 
     # The next character which must be typed
-    next_char = sentence.get_next_char()
+    next_char = sentence.next_char()
 
     while True:
         key = stdscr.getkey()
 
         if (key == 'KEY_BACKSPACE'):
+            # Remove previous character
+            (previous_pos_y, previous_pos_x) = cursor_positions.pop()
+            stdscr.delch(previous_pos_y, previous_pos_x)
+
+            # If there are incorrect characters on
+            # screen, backspacing must be to remove these.
             if (incorrect_characters_on_screen > 0):
                 incorrect_characters_on_screen -= 1
+            # If there are no incorrect characters on screen,
+            # we must be removing correctly typed characters.
+            else:
+                next_char = sentence.previous_char()
         else:
             cursor_positions.append(stdscr.getyx())
 
-            # Typed character cannot be correct if there are 
+            # Typed character cannot be correct if there are
             # incorrectly typed characters currently on screen.
-            if (incorrect_characters_on_screen > 0):
-                continue
-
-            if (key == next_char):
+            if (key == next_char and incorrect_characters_on_screen <= 0):
                 if (sentence.has_more_chars() == False):
                     print("Success")
                     break
 
-                next_char = sentence.get_next_char()
+                # Draw correcly typed character
+                stdscr.addstr(key, curses.A_BOLD)
+                next_char = sentence.next_char()
             else:
+                # Draw incorrectly typed character
+                stdscr.addstr(key, curses.A_UNDERLINE)
                 incorrect_characters_on_screen += 1
 
-main(stdscr)
+
+wrapper(main)

@@ -8,15 +8,14 @@ curses.noecho()
 curses.cbreak()
 curses.curs_set(False)
 
+
 def generate_sentence():
     return "Hello World"
+
 
 def main(stdscr):
     # Clear the screen
     stdscr.clear()
-
-    # Get screen width/height
-    (max_y, max_x) = stdscr.getmaxyx()
 
     # Keep track of (y, x) coordinates
     cursor_positions = []
@@ -34,23 +33,34 @@ def main(stdscr):
     overwritten_chars = []
 
     # Draw window to show sentence
-    sentence_window = stdscr.derwin(max_y, max_x, 0, 0)
+    (max_y, max_x) = stdscr.getmaxyx()
+    sentence_window_height = 10
+    sentence_window_width = 30
+    sentence_window_y = int((max_y - sentence_window_height) / 2)
+    sentence_window_x = int((max_x - sentence_window_width) / 2)
+    sentence_window = stdscr.derwin(
+        sentence_window_height,
+        sentence_window_width,
+        sentence_window_y,
+        sentence_window_x,
+    )
     sentence_window.border('|', '|', '-', '-', '+', '+', '+', '+')
     sentence_window.addstr(1, 1, sentence.get_sentence(), curses.A_DIM)
-    stdscr.move(1, 1)
+    sentence_window.move(1, 1)
+    sentence_window.keypad(1)
 
     while True:
-        key = stdscr.getkey()
+        key = sentence_window.getkey()
 
-        if (key == 'KEY_BACKSPACE'):
+        if (key == "KEY_BACKSPACE"):
             if (len(cursor_positions) < 1):
                 continue
 
             # Remove previous character
             (previous_pos_y, previous_pos_x) = cursor_positions.pop()
             overwritten_char = overwritten_chars.pop()
-            stdscr.addstr(previous_pos_y, previous_pos_x, overwritten_char)
-            stdscr.move(previous_pos_y, previous_pos_x)
+            sentence_window.addstr(previous_pos_y, previous_pos_x, overwritten_char)
+            sentence_window.move(previous_pos_y, previous_pos_x)
 
             # If there are incorrect characters on
             # screen, backspacing must be to remove these.
@@ -62,8 +72,8 @@ def main(stdscr):
                 next_char = sentence.previous_char()
         else:
             # Keep track of characters that have been overwritten
-            (current_pos_y, current_pos_x) = stdscr.getyx()
-            char_at_cursor = stdscr.instr(current_pos_y, current_pos_x, 1)
+            (current_pos_y, current_pos_x) = sentence_window.getyx()
+            char_at_cursor = sentence_window.instr(current_pos_y, current_pos_x, 1)
             cursor_positions.append((current_pos_y, current_pos_x))
             overwritten_chars.append(char_at_cursor)
 
@@ -75,16 +85,12 @@ def main(stdscr):
                     break
 
                 # Draw correcly typed character
-                stdscr.addstr(key, curses.A_BOLD)
+                sentence_window.addstr(key, curses.A_BOLD)
                 next_char = sentence.next_char()
             else:
                 # Draw incorrectly typed character
-                stdscr.addstr(key, curses.A_UNDERLINE)
+                sentence_window.addstr(key, curses.A_UNDERLINE)
                 incorrect_characters_on_screen += 1
-
-
-
-
 
 
 wrapper(main)

@@ -17,7 +17,7 @@ class Sentence:
             return self.sentence[self.index]
 
     def has_more_chars(self):
-        return self.index < len(self.sentence)
+        return self.index < len(self.sentence) - 1
 
     def get_sentence(self):
         return self.original_sentence

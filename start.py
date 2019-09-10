@@ -22,7 +22,6 @@ class Game:
         curses.resize_term(100, 60)
 
     def init_screen(self):
-        "Initialize screen."
         self.stdscr.keypad(True)
         self.stdscr.clear()
         self.stdscr.addstr(self.game_state.get_sentence(), curses.A_LOW)
@@ -40,6 +39,7 @@ class Game:
             self.stdscr.move(previous_cursor_position[0], previous_cursor_position[1])
 
     def start_game_loop(self):
+        "Start main game loop."
         while True:
             key = self.stdscr.getkey()
 
@@ -60,18 +60,16 @@ class Game:
                 if result == True:
                     self.stdscr.addstr(key, curses.A_BOLD)
                     self.push_cursor_position()
-                    self.stdscr.addstr(
-                        10, 0, "WPM: {}".format(self.metrics_counter.current_wpm())
-                    )
+                    current_wpm = self.metrics_counter.current_wpm()
+                    self.stdscr.addstr(10, 0, "WPM: {}".format(current_wpm))
                     self.pop_cursor_position()
 
                     if self.game_state.has_more_characters() == False:
+                        overall_wpm = self.metrics_counter.overall_wpm()
                         self.stdscr.addstr(
                             10,
                             0,
-                            "WPM: {}. Press any key to exit...".format(
-                                self.metrics_counter.overall_wpm()
-                            ),
+                            "WPM: {}. Press any key to exit...".format(overall_wpm),
                         )
                         key = self.stdscr.getkey()
                         break

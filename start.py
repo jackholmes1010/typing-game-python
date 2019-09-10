@@ -26,30 +26,22 @@ def main(stdscr):
             if len(cursor_positions) < 1:
                 continue
 
-            # Restore overwritten characters
-            process_backspace_result = helper.process_backspace()
+            # Remove character previous character/ restore overwritten characters.
+            result = helper.process_backspace()
             previous_pos = cursor_positions.pop()
             stdscr.move(previous_pos[0], previous_pos[1])
             pos = stdscr.getyx()
-
-            if process_backspace_result != " ":
-                stdscr.addstr(process_backspace_result)
-            else:
-                stdscr.addstr(process_backspace_result)
-
+            stdscr.addstr(result)
             stdscr.move(pos[0], pos[1])
 
-            # If there are incorrect characters on
-            # screen, backspacing must be to remove these.
             if incorrect_character_count > 0:
                 incorrect_character_count -= 1
-
         else:
             pos = stdscr.getyx()
             cursor_positions.append(pos)
-            process_key_result = helper.process_key(key)
+            result = helper.process_key(key)
 
-            if process_key_result == True and incorrect_character_count <= 0:
+            if result == True and incorrect_character_count <= 0:
                 stdscr.addstr(key, curses.A_BOLD)
 
                 if helper.has_more_characters() == False:

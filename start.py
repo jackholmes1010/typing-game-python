@@ -26,7 +26,6 @@ def main(stdscr):
             if len(cursor_positions) < 1:
                 continue
 
-            # Remove character previous character/ restore overwritten characters.
             result = helper.process_backspace()
             previous_pos = cursor_positions.pop()
             stdscr.move(previous_pos[0], previous_pos[1])

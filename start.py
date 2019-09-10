@@ -1,15 +1,15 @@
 import curses
 import time
 from curses import wrapper
-from Helper import Helper
-from Timer import Metrics
+from GameState import GameState
+from MetricsCounter import MetricsCounter
 
 
 class Game:
     def __init__(self, stdscr):
         self.stdscr = stdscr
-        self.helper = Helper()
-        self.metrics = Metrics()
+        self.game_state = GameState()
+        self.metrics_counter = MetricsCounter()
         self.cursor_positions = []
         self.incorrect_character_count = 0
         self.init_screen()
@@ -26,7 +26,7 @@ class Game:
         "Initialize screen."
         self.stdscr.keypad(True)
         self.stdscr.clear()
-        self.stdscr.addstr(self.helper.get_sentence(), curses.A_LOW)
+        self.stdscr.addstr(self.game_state.get_sentence(), curses.A_LOW)
         self.stdscr.move(0, 0)
 
     def push_cursor_position(self):
@@ -48,7 +48,7 @@ class Game:
                 if len(self.cursor_positions) < 1:
                     continue
 
-                result = self.helper.process_backspace()
+                result = self.game_state.process_backspace()
                 self.pop_cursor_position()
                 self.push_cursor_position()
                 self.stdscr.addstr(result)
@@ -59,22 +59,22 @@ class Game:
             else:
                 self.push_cursor_position()
 
-                result = self.helper.process_key(key)
+                result = self.game_state.process_key(key)
 
                 if result == True and self.incorrect_character_count <= 0:
                     self.stdscr.addstr(key, curses.A_BOLD)
                     self.push_cursor_position()
                     self.stdscr.addstr(
-                        10, 0, "WPM: {}".format(self.metrics.current_wpm())
+                        10, 0, "WPM: {}".format(self.metrics_counter.current_wpm())
                     )
                     self.pop_cursor_position()
 
-                    if self.helper.has_more_characters() == False:
+                    if self.game_state.has_more_characters() == False:
                         self.stdscr.addstr(
                             10,
                             0,
                             "WPM: {}. Press any key to exit...".format(
-                                self.metrics.overall_wpm()
+                                self.metrics_counter.overall_wpm()
                             ),
                         )
                         key = self.stdscr.getkey()

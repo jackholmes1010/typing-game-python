@@ -1,7 +1,7 @@
 import time
 
 
-class Metrics:
+class MetricsCounter:
     def __init__(self):
         self.start = time.time()
         self.tick = time.time()

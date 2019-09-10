@@ -1,7 +1,9 @@
-class Helper:
+from SentenceGenerator import SentenceGenerator
+
+class GameState:
     def __init__(self, sentence=""):
         if sentence == "":
-            self.sentence = self.generate_sentence()
+            self.sentence = SentenceGenerator().generate_sentence()
         else:
             self.sentence = sentence
 
@@ -36,6 +38,3 @@ class Helper:
 
     def get_sentence(self):
         return self.sentence
-
-    def generate_sentence(self):
-        return "Herp derpsum tee sherper perp."

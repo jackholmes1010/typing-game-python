@@ -1,19 +1,30 @@
 import curses
+import time
 from curses import wrapper
 from Helper import Helper
+from Timer import Metrics
 
 stdscr = curses.initscr()
 stdscr.keypad(True)
 curses.noecho()
 curses.cbreak()
 curses.curs_set(True)
-curses.resize_term(100, 50)
+curses.resize_term(100, 60)
 
+class Positions:
+    def push_cursor_position(self, stdscr):
+        self.position = stdscr.getyx()
+
+    def pop_cursor_position(self, stdscr):
+        stdscr.move(self.position[0], self.position[1])
 
 def main(stdscr):
     helper = Helper()
+    positions = Positions()
+    metrics = Metrics()
     cursor_positions = []
     incorrect_character_count = 0
+    num_chars_typed = 0
 
     stdscr.clear()
     stdscr.addstr(helper.get_sentence(), curses.A_LOW)
@@ -42,9 +53,19 @@ def main(stdscr):
 
             if result == True and incorrect_character_count <= 0:
                 stdscr.addstr(key, curses.A_BOLD)
+                num_chars_typed += 1
+
+                positions.push_cursor_position(stdscr)
+                current_cpm = metrics.current_cpm()
+                current_wpm = current_cpm / 5
+                stdscr.addstr(9, 0, "WPM: {}".format(current_wpm))
+                positions.pop_cursor_position(stdscr)
 
                 if helper.has_more_characters() == False:
-                    print("Success")
+                    overall_cpm = metrics.overall_cpm()
+                    overall_wpm = overall_cpm / 5
+                    stdscr.addstr(10, 0, "WPM: {}. Press any key to exit...".format(overall_wpm))
+                    key = stdscr.getkey()
                     break
             else:
                 stdscr.addstr(key, curses.A_UNDERLINE)

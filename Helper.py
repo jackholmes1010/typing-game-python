@@ -38,4 +38,4 @@ class Helper:
         return self.sentence
 
     def generate_sentence(self):
-        return "Herp derpsum tee sherper perp derps derperker derpler ler merpus nerpy. Sherper perper derpsum herpderpsmer derperker, me merpus nerpy herpsum."
+        return "Herp derpsum tee sherper perp."

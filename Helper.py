@@ -1,6 +1,6 @@
 class Helper:
-    def __init__(self, sentence = ''):
-        if (sentence == ''):
+    def __init__(self, sentence=""):
+        if sentence == "":
             self.sentence = self.generate_sentence()
         else:
             self.sentence = sentence
@@ -8,25 +8,25 @@ class Helper:
         self.index = 0
 
     def process_key(self, key):
-        if (self.index >= len(self.sentence)):
+        if self.index >= len(self.sentence):
             return True
 
         char = self.sentence[self.index]
         self.index += 1
 
-        if (char == key):
+        if char == key:
             return True
 
         return False
 
     def process_backspace(self):
-        if (self.index > 0):
+        if self.index > 0:
             self.index -= 1
 
-        if (self.index >= len(self.sentence)):
-            return ' '
+        if self.index >= len(self.sentence):
+            return " "
 
-        if (self.index < 1):
+        if self.index < 1:
             return self.sentence[0]
 
         return self.sentence[self.index]

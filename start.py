@@ -9,6 +9,7 @@ curses.cbreak()
 curses.curs_set(True)
 curses.resize_term(100, 50)
 
+
 def main(stdscr):
     helper = Helper()
     cursor_positions = []

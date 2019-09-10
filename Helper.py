@@ -11,21 +11,18 @@ class Helper:
         self.index = 0
 
     def process_key(self, key):
-        self.index += 1
-
         if (self.index >= len(self.sentence)):
             return True
 
         char = self.sentence[self.index]
+        self.index += 1
 
         if (char == key):
             return True
 
         return False
 
-    # Give back the original char
     def process_backspace(self):
-
         if (self.index > 0):
             self.index -= 1
 

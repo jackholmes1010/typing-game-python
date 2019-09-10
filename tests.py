@@ -1,6 +1,6 @@
 import unittest
 from Sentence import Sentence
-from start2 import Helper
+from Helper import Helper
 
 
 class TestHelper(unittest.TestCase):

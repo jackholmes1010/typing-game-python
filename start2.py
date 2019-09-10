@@ -1,51 +1,6 @@
 import curses
 from curses import wrapper
-from Sentence import Sentence
-
-# Each sentence has correct parts, un typed parts
-# Backspacing gives back the original char
-# Processing key gives correct or false
-class Helper:
-    def __init__(self, sentence = ''):
-        if (sentence == ''):
-            self.sentence = self.generate_sentence()
-        else:
-            self.sentence = sentence
-
-        self.index = 0
-
-    def process_key(self, key):
-        self.index += 1
-
-        if (self.index >= len(self.sentence)):
-            return True
-
-        char = self.sentence[self.index]
-
-        if (char == key):
-            return True
-
-        return False
-
-    # Give back the original char
-    def process_backspace(self):
-
-        if (self.index > 0):
-            self.index -= 1
-
-        if (self.index >= len(self.sentence)):
-            return ' '
-
-        if (self.index < 1):
-            return self.sentence[0]
-
-        return self.sentence[self.index]
-
-    def get_sentence(self):
-        return self.sentence
-
-    def generate_sentence(self):
-        return "Hello World!"
+from Helper import Helper
 
 stdscr = curses.initscr()
 stdscr.keypad(True)
@@ -53,34 +8,42 @@ curses.noecho()
 curses.cbreak()
 curses.curs_set(False)
 
+# Keep track of cursor positions
+cursor_positions = []
+
+helper = Helper()
+
 def main(stdscr):
-    helper = Helper()
+    stdscr.clear()
     stdscr.addstr(helper.get_sentence(), curses.A_UNDERLINE)
     stdscr.move(0, 0)
-
-    # Keep track of cursur (y, x) coordinates
-    cursor_positions = []
 
     while True:
         key = stdscr.getkey()
 
         if (key == 'KEY_BACKSPACE'):
-            process_backspace_result = helper.process_backspace()
-            stdscr.addstr('\b')
-            stdscr.addstr(process_backspace_result, curses.A_UNDERLINE)
-            stdscr.addstr('\b')
+            if len(cursor_positions) < 1:
+                continue
 
-            # Remove previous character
-            # (previous_pos_y, previous_pos_x) = cursor_positions.pop()
-            # stdscr.addstr(previous_pos_y, previous_pos_x, process_backspace_result)
-            # stdscr.move(previous_pos_y, previous_pos_x)
+            process_backspace_result = helper.process_backspace()
+            previous_pos = cursor_positions.pop()
+            stdscr.move(previous_pos[0], previous_pos[1])
+            pos = stdscr.getyx()
+
+            if (process_backspace_result != ' '):
+                stdscr.addstr(process_backspace_result, curses.A_UNDERLINE)
+            else:
+                stdscr.addstr(process_backspace_result)
+
+            stdscr.move(pos[0], pos[1])
         else:
+            pos = stdscr.getyx()
+            cursor_positions.append(pos)
+
             process_key_result = helper.process_key(key)
             stdscr.addstr(key)
 
-            # Keep track of the cursor position
-            # (current_pos_y, current_pos_x) = stdscr.getyx()
-            # cursor_positions.append((current_pos_y, current_pos_x))
+        curses.napms(10)
 
     
 wrapper(main)

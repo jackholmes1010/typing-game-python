@@ -1,96 +1,64 @@
 import curses
 from curses import wrapper
-from Sentence import Sentence
+from Helper import Helper
 
 stdscr = curses.initscr()
 stdscr.keypad(True)
 curses.noecho()
 curses.cbreak()
-curses.curs_set(False)
-
-
-def generate_sentence():
-    return "Hello World"
-
+curses.curs_set(True)
+curses.resize_term(100, 50)
 
 def main(stdscr):
-    # Clear the screen
-    stdscr.clear()
-
-    # Keep track of (y, x) coordinates
+    helper = Helper()
     cursor_positions = []
+    incorrect_character_count = 0
 
-    # Generate sentence to type
-    sentence = Sentence()
-
-    # State indicates if there are incorrectly typed characters on screen
-    incorrect_characters_on_screen = 0
-
-    # The next character which must be typed
-    next_char = sentence.next_char()
-
-    # Keep track of characters that have been overwritten
-    overwritten_chars = []
-
-    # Draw window to show sentence
-    (max_y, max_x) = stdscr.getmaxyx()
-    sentence_window_height = 10
-    sentence_window_width = 30
-    sentence_window_y = int((max_y - sentence_window_height) / 2)
-    sentence_window_x = int((max_x - sentence_window_width) / 2)
-    sentence_window = stdscr.derwin(
-        sentence_window_height,
-        sentence_window_width,
-        sentence_window_y,
-        sentence_window_x,
-    )
-    sentence_window.border("|", "|", "-", "-", "+", "+", "+", "+")
-    sentence_window.addstr(1, 1, sentence.get_sentence(), curses.A_DIM)
-    sentence_window.move(1, 1)
-    sentence_window.keypad(1)
+    stdscr.clear()
+    stdscr.addstr(helper.get_sentence(), curses.A_LOW)
+    stdscr.move(0, 0)
 
     while True:
-        key = sentence_window.getkey()
+        key = stdscr.getkey()
 
         if key == "KEY_BACKSPACE":
             if len(cursor_positions) < 1:
                 continue
 
-            # Remove previous character
-            (previous_pos_y, previous_pos_x) = cursor_positions.pop()
-            overwritten_char = overwritten_chars.pop()
-            sentence_window.addstr(previous_pos_y, previous_pos_x, overwritten_char)
-            sentence_window.move(previous_pos_y, previous_pos_x)
+            # Restore overwritten characters
+            process_backspace_result = helper.process_backspace()
+            previous_pos = cursor_positions.pop()
+            stdscr.move(previous_pos[0], previous_pos[1])
+            pos = stdscr.getyx()
+
+            if process_backspace_result != " ":
+                stdscr.addstr(process_backspace_result)
+            else:
+                stdscr.addstr(process_backspace_result)
+
+            stdscr.move(pos[0], pos[1])
 
             # If there are incorrect characters on
             # screen, backspacing must be to remove these.
-            if incorrect_characters_on_screen > 0:
-                incorrect_characters_on_screen -= 1
-            # If there are no incorrect characters on screen,
-            # we must be removing correctly typed characters.
-            else:
-                next_char = sentence.previous_char()
-        else:
-            # Keep track of characters that have been overwritten
-            (current_pos_y, current_pos_x) = sentence_window.getyx()
-            char_at_cursor = sentence_window.instr(current_pos_y, current_pos_x, 1)
-            cursor_positions.append((current_pos_y, current_pos_x))
-            overwritten_chars.append(char_at_cursor)
+            if incorrect_character_count > 0:
+                incorrect_character_count -= 1
 
-            # Typed character cannot be correct if there are
-            # incorrectly typed characters currently on screen.
-            if key == next_char and incorrect_characters_on_screen <= 0:
-                if sentence.has_more_chars() == False:
+        else:
+            pos = stdscr.getyx()
+            cursor_positions.append(pos)
+            process_key_result = helper.process_key(key)
+
+            if process_key_result == True and incorrect_character_count <= 0:
+                stdscr.addstr(key, curses.A_BOLD)
+
+                if helper.has_more_characters() == False:
                     print("Success")
                     break
-
-                # Draw correcly typed character
-                sentence_window.addstr(key, curses.A_BOLD)
-                next_char = sentence.next_char()
             else:
-                # Draw incorrectly typed character
-                sentence_window.addstr(key, curses.A_UNDERLINE)
-                incorrect_characters_on_screen += 1
+                stdscr.addstr(key, curses.A_UNDERLINE)
+                incorrect_character_count += 1
+
+        curses.napms(10)
 
 
 wrapper(main)

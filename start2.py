@@ -7,6 +7,7 @@ stdscr.keypad(True)
 curses.noecho()
 curses.cbreak()
 curses.curs_set(False)
+curses.resize_term(100, 50)
 
 # Keep track of cursor positions
 cursor_positions = []
@@ -15,7 +16,7 @@ helper = Helper()
 
 def main(stdscr):
     stdscr.clear()
-    stdscr.addstr(helper.get_sentence(), curses.A_UNDERLINE)
+    stdscr.addstr(helper.get_sentence())
     stdscr.move(0, 0)
 
     while True:
@@ -31,7 +32,7 @@ def main(stdscr):
             pos = stdscr.getyx()
 
             if (process_backspace_result != ' '):
-                stdscr.addstr(process_backspace_result, curses.A_UNDERLINE)
+                stdscr.addstr(process_backspace_result)
             else:
                 stdscr.addstr(process_backspace_result)
 
@@ -41,7 +42,12 @@ def main(stdscr):
             cursor_positions.append(pos)
 
             process_key_result = helper.process_key(key)
-            stdscr.addstr(key)
+
+            if (process_key_result == True):
+                stdscr.addstr(key, curses.A_BOLD)
+            else:
+                stdscr.addstr(key, curses.A_UNDERLINE)
+
 
         curses.napms(10)
 

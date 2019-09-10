@@ -1,5 +1,6 @@
 from SentenceGenerator import SentenceGenerator
 
+
 class GameState:
     def __init__(self, sentence=""):
         if sentence == "":
@@ -8,20 +9,25 @@ class GameState:
             self.sentence = sentence
 
         self.index = 0
+        self.incorrect_character_count = 0
 
     def process_key(self, key):
-        if self.index >= len(self.sentence):
-            return True
-
-        char = self.sentence[self.index]
+        index = self.index
         self.index += 1
 
-        if char == key:
+        if index >= len(self.sentence):
+            return False
+
+        if self.sentence[index] == key and self.incorrect_character_count <= 0:
             return True
 
+        self.incorrect_character_count += 1
         return False
 
     def process_backspace(self):
+        if self.incorrect_character_count > 0:
+            self.incorrect_character_count -= 1
+
         if self.index > 0:
             self.index -= 1
 

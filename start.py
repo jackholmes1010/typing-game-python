@@ -11,7 +11,6 @@ class Game:
         self.game_state = GameState()
         self.metrics_counter = MetricsCounter()
         self.cursor_positions = []
-        self.incorrect_character_count = 0
         self.init_screen()
         self.init_curses()
         self.push_cursor_position()
@@ -53,15 +52,12 @@ class Game:
                 self.push_cursor_position()
                 self.stdscr.addstr(result)
                 self.pop_cursor_position()
-
-                if self.incorrect_character_count > 0:
-                    self.incorrect_character_count -= 1
             else:
                 self.push_cursor_position()
 
                 result = self.game_state.process_key(key)
 
-                if result == True and self.incorrect_character_count <= 0:
+                if result == True:
                     self.stdscr.addstr(key, curses.A_BOLD)
                     self.push_cursor_position()
                     self.stdscr.addstr(
@@ -81,7 +77,6 @@ class Game:
                         break
                 else:
                     self.stdscr.addstr(key, curses.A_UNDERLINE)
-                    self.incorrect_character_count += 1
 
             curses.napms(10)
 

@@ -148,6 +148,7 @@ class Game:
                         self.display_overall_wpm()
                         break
                 else:
+                    self.update_current_wpm(correctly_typed=False)
                     self.add_str(key, attr=curses.A_UNDERLINE)
 
             curses.napms(10)

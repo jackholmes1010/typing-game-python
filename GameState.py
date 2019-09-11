@@ -15,10 +15,10 @@ class GameState:
         index = self.index
         self.index += 1
 
-        if index >= len(self.sentence):
+        if index >= len(self.sentence.text):
             return False
 
-        if self.sentence[index] == key and self.incorrect_character_count <= 0:
+        if self.sentence.text[index] == key and self.incorrect_character_count <= 0:
             return True
 
         self.incorrect_character_count += 1
@@ -31,16 +31,16 @@ class GameState:
         if self.index > 0:
             self.index -= 1
 
-        if self.index >= len(self.sentence):
+        if self.index >= len(self.sentence.text):
             return " "
 
         if self.index < 1:
-            return self.sentence[0]
+            return self.sentence.text[0]
 
-        return self.sentence[self.index]
+        return self.sentence.text[self.index]
 
     def has_more_characters(self):
-        return self.index < len(self.sentence)
+        return self.index < len(self.sentence.text)
 
     def get_sentence(self):
-        return self.sentence
+        return self.sentence.text

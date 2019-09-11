@@ -41,7 +41,7 @@ class Game:
             # Displaying the bubbles is a hack fix for the bug where holding
             # backspace causes the cursor to get stuck at the beginning of
             # the previous line. I don't know why this works but it does... ¯\_(ツ)_/¯
-            self.stdscr.addstr(10, 0, self.get_next_bubble_animation_frame())
+            self.add_str(self.get_next_bubble_animation_frame(), y=10, x=0)
             self.stdscr.move(previous_cursor_position[0], previous_cursor_position[1])
 
     def get_next_bubble_animation_frame(self):
@@ -74,13 +74,13 @@ class Game:
 
         for i in range(len(frames)):
             curses.napms(50)
-            self.stdscr.addstr(start_y + i, start_x, frames[i])
+            self.add_str(frames[i], y=start_y + i, x=start_x)
             self.stdscr.refresh()
 
         (y, _x) = self.stdscr.getyx()
 
         for i in range(43):
-            self.stdscr.addstr(y + 1, start_x + i, "::")
+            self.add_str("::", y=y + 1, x=start_x + i)
             self.stdscr.refresh()
             curses.napms(5)
 
@@ -93,31 +93,31 @@ class Game:
         if correctly_typed:
             self.metrics_counter.increment_correct_character_count()
 
-        self.push_cursor_position()
         current_wpm = self.metrics_counter.current_wpm()
-        self.stdscr.addstr(10, 2, "WPM: {}".format(current_wpm))
-        self.pop_cursor_position()
+        self.add_str("WPM: {}".format(current_wpm), y=10, x=2, move_cursor=False)
 
     def display_overall_wpm(self):
         "Update overall WPM display."
         overall_wpm = self.metrics_counter.overall_wpm()
-        self.stdscr.addstr(
-            10, 2, "WPM: {}. Press any key to exit...".format(overall_wpm)
-        )
+        self.add_str("WPM: {}. Press any key to exit...".format(overall_wpm), y=10, x=2)
         self.stdscr.getkey()
 
-    def add_str(self, text, attr = curses.A_NORMAL, move_cursor=True):
+    def add_str(self, text, y=None, x=None, attr=curses.A_NORMAL, move_cursor=True):
         "Paint text to the screen."
-        if (move_cursor == False):
+        if move_cursor == False:
             self.push_cursor_position()
-            self.stdscr.addstr(text, attr)
-            self.pop_cursor_position()
+
+        if x != None and y != None:
+            self.stdscr.addstr(y, x, text, attr)
         else:
-            self.stdscr.addstr(text, attr)        
+            self.stdscr.addstr(text, attr)
+
+        if move_cursor == False:
+            self.pop_cursor_position()
 
     def start_game_loop(self):
         "Start main game loop."
-        self.stdscr.addstr(self.game_state.get_sentence(), curses.A_LOW)
+        self.add_str(self.game_state.get_sentence(), attr=curses.A_LOW)
         self.stdscr.move(0, 0)
 
         while True:
@@ -148,7 +148,7 @@ class Game:
                         self.display_overall_wpm()
                         break
                 else:
-                    self.stdscr.addstr(key, curses.A_UNDERLINE)
+                    self.add_str(key, attr=curses.A_UNDERLINE)
 
             curses.napms(10)
 

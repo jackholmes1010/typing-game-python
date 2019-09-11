@@ -9,9 +9,10 @@ class MetricsCounter:
         self.wpm = 0
         self.total_characters_typed = 0
 
-    def current_wpm(self):
+    def increment_correct_character_count(self):
         self.total_characters_typed += 1
 
+    def current_wpm(self):
         if self.count % 5 == 0:
             elapsed = self.get_elapsed_time()
             self.wpm = self.total_characters_typed / elapsed / 5

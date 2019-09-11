@@ -18,11 +18,13 @@ class Game:
         self.push_cursor_position()
 
     def init_curses(self):
+        "Curses module setup."
         curses.noecho()
         curses.cbreak()
         curses.curs_set(True)
 
     def init_screen(self):
+        "Initial screen setup."
         self.stdscr.keypad(True)
         self.stdscr.clear()
 
@@ -36,8 +38,8 @@ class Game:
         "Move to previous cursor position."
         if len(self.cursor_positions) > 0:
             previous_cursor_position = self.cursor_positions.pop()
-            # Displaying the bubbles is a hack fix for the bug where holding 
-            # backspace causes the cursor to get stuck at the beginning of 
+            # Displaying the bubbles is a hack fix for the bug where holding
+            # backspace causes the cursor to get stuck at the beginning of
             # the previous line. I don't know why this works but it does... ¯\_(ツ)_/¯
             self.stdscr.addstr(10, 0, self.get_next_bubble_animation_frame())
             self.stdscr.move(previous_cursor_position[0], previous_cursor_position[1])
@@ -86,9 +88,35 @@ class Game:
         curses.curs_set(True)
         self.stdscr.clear()
 
+    def update_current_wpm(self, correctly_typed=True):
+        "Update current WPM display."
+        if correctly_typed:
+            self.metrics_counter.increment_correct_character_count()
+
+        self.push_cursor_position()
+        current_wpm = self.metrics_counter.current_wpm()
+        self.stdscr.addstr(10, 2, "WPM: {}".format(current_wpm))
+        self.pop_cursor_position()
+
+    def display_overall_wpm(self):
+        "Update overall WPM display."
+        overall_wpm = self.metrics_counter.overall_wpm()
+        self.stdscr.addstr(
+            10, 2, "WPM: {}. Press any key to exit...".format(overall_wpm)
+        )
+        self.stdscr.getkey()
+
+    def add_str(self, text, attr = curses.A_NORMAL, move_cursor=True):
+        "Paint text to the screen."
+        if (move_cursor == False):
+            self.push_cursor_position()
+            self.stdscr.addstr(text, attr)
+            self.pop_cursor_position()
+        else:
+            self.stdscr.addstr(text, attr)        
+
     def start_game_loop(self):
         "Start main game loop."
-
         self.stdscr.addstr(self.game_state.get_sentence(), curses.A_LOW)
         self.stdscr.move(0, 0)
 
@@ -100,30 +128,24 @@ class Game:
                     continue
 
                 result = self.game_state.process_backspace()
-                self.pop_cursor_position()
-                self.push_cursor_position()
-                self.stdscr.addstr(result)
-                self.pop_cursor_position()
-            else:
-                self.push_cursor_position()
 
+                # Move cursor back to previous position
+                self.pop_cursor_position()
+
+                self.add_str(result, move_cursor=False)
+                self.update_current_wpm(correctly_typed=False)
+            else:
                 result = self.game_state.process_key(key)
 
+                # Save current cursor position to support backspacing
+                self.push_cursor_position()
+
                 if result == True:
-                    self.stdscr.addstr(key, curses.A_BOLD)
-                    self.push_cursor_position()
-                    current_wpm = self.metrics_counter.current_wpm()
-                    self.stdscr.addstr(10, 2, "WPM: {}".format(current_wpm))
-                    self.pop_cursor_position()
+                    self.add_str(key, attr=curses.A_BOLD)
+                    self.update_current_wpm(correctly_typed=True)
 
                     if self.game_state.has_more_characters() == False:
-                        overall_wpm = self.metrics_counter.overall_wpm()
-                        self.stdscr.addstr(
-                            10,
-                            2,
-                            "WPM: {}. Press any key to exit...".format(overall_wpm),
-                        )
-                        key = self.stdscr.getkey()
+                        self.display_overall_wpm()
                         break
                 else:
                     self.stdscr.addstr(key, curses.A_UNDERLINE)

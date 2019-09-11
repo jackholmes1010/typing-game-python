@@ -1,3 +1,3 @@
 class SentenceGenerator:
     def generate_sentence(self):
-        return "Hello World!"
+        return "Herp derpsum sherper herpy derpus jerpy berps cerp terpus. Derpy merpus pee derpler berps! Perp sherper herp terp herpy derpler. Sherper merp herpler herp pee. Derpler terpus, mer re berp der perp se? Ze ter derps tee! Herpsum derp sherper ler merp derperker jerpy derpler herderder zerpus. Derp sherper perper tee. Derperker zerpus ner cerp terpus herpy sherpus sherp. Perp derp pee serp herp zerpus herpem herderder derpler berp! Merpus derpy herpler sherp derps perper derperker derp dee der. Merpus der derps, derpus herpderpsmer! Derp merp er sherpus dee perp herpy derpsum perper pee. Herpler derpsum me sherlamer ler derpler derpy. Cerp de perper derpy. Le herderder herpler re ter. Serp ze derperker re. Terp berps terpus ter, er perp derpsum."

@@ -1,4 +1,5 @@
 import curses
+import random
 import time
 from curses import wrapper
 from GameState import GameState
@@ -11,6 +12,7 @@ class Game:
         self.game_state = GameState()
         self.metrics_counter = MetricsCounter()
         self.cursor_positions = []
+        self.bubble_frame_index = 0
         self.init_screen()
         self.init_curses()
         self.push_cursor_position()
@@ -27,14 +29,24 @@ class Game:
     def push_cursor_position(self):
         "Save current cursor position."
         cursor_position = self.stdscr.getyx()
+        self.stdscr.move(cursor_position[0], cursor_position[1])
         self.cursor_positions.append(cursor_position)
 
     def pop_cursor_position(self):
         "Move to previous cursor position."
         if len(self.cursor_positions) > 0:
             previous_cursor_position = self.cursor_positions.pop()
-            self.stdscr.move(
-                previous_cursor_position[0], previous_cursor_position[1])
+            self.stdscr.addstr(10, 0, self.get_next_bubble_animation_frame())
+            self.stdscr.move(previous_cursor_position[0], previous_cursor_position[1])
+
+    def get_next_bubble_animation_frame(self):
+        bubbles = [".", "o", "O", "@", "*"]
+
+        self.bubble_frame_index += 1
+        if self.bubble_frame_index >= len(bubbles):
+            self.bubble_frame_index = 0
+
+        return bubbles[self.bubble_frame_index]
 
     def play_start_animation(self):
         frames = [
@@ -66,7 +78,7 @@ class Game:
             curses.napms(5)
 
         curses.napms(300)
-        curses.curs_set(True)        
+        curses.curs_set(True)
         self.stdscr.clear()
 
     def start_game_loop(self):
@@ -96,16 +108,15 @@ class Game:
                     self.stdscr.addstr(key, curses.A_BOLD)
                     self.push_cursor_position()
                     current_wpm = self.metrics_counter.current_wpm()
-                    self.stdscr.addstr(10, 0, "WPM: {}".format(current_wpm))
+                    self.stdscr.addstr(10, 2, "WPM: {}".format(current_wpm))
                     self.pop_cursor_position()
 
                     if self.game_state.has_more_characters() == False:
                         overall_wpm = self.metrics_counter.overall_wpm()
                         self.stdscr.addstr(
                             10,
-                            0,
-                            "WPM: {}. Press any key to exit...".format(
-                                overall_wpm),
+                            2,
+                            "WPM: {}. Press any key to exit...".format(overall_wpm),
                         )
                         key = self.stdscr.getkey()
                         break

@@ -19,13 +19,10 @@ class Game:
         curses.noecho()
         curses.cbreak()
         curses.curs_set(True)
-        curses.resize_term(100, 60)
 
     def init_screen(self):
         self.stdscr.keypad(True)
         self.stdscr.clear()
-        self.stdscr.addstr(self.game_state.get_sentence(), curses.A_LOW)
-        self.stdscr.move(0, 0)
 
     def push_cursor_position(self):
         "Save current cursor position."
@@ -36,10 +33,48 @@ class Game:
         "Move to previous cursor position."
         if len(self.cursor_positions) > 0:
             previous_cursor_position = self.cursor_positions.pop()
-            self.stdscr.move(previous_cursor_position[0], previous_cursor_position[1])
+            self.stdscr.move(
+                previous_cursor_position[0], previous_cursor_position[1])
+
+    def play_start_animation(self):
+        frames = [
+            ":::       :::::::::::: :::::::::   :::   :::",
+            "+:       :+::+:    :+::+:    :+: :+:+: :+:+:",
+            ":+       +:++:+    +:++:+    +:++:+ +:+:+ +:+",
+            "#+  +:+  +#++#++:++#+ +#++:++#+ +#+  +:+  +#+",
+            "+ +#+#+ +#++#+       +#+       +#+       +#+",
+            "#+#+# #+#+# #+#       #+#       #+#       #+#",
+            "###   ###  ###       ###       ###       ###",
+        ]
+
+        curses.curs_set(False)
+
+        (max_y, max_x) = self.stdscr.getmaxyx()
+        start_y = int(max_y / 2) - 5
+        start_x = int(max_x / 2) - 30
+
+        for i in range(len(frames)):
+            curses.napms(50)
+            self.stdscr.addstr(start_y + i, start_x, frames[i])
+            self.stdscr.refresh()
+
+        (y, _x) = self.stdscr.getyx()
+
+        for i in range(43):
+            self.stdscr.addstr(y + 1, start_x + i, "::")
+            self.stdscr.refresh()
+            curses.napms(5)
+
+        curses.napms(300)
+        curses.curs_set(True)        
+        self.stdscr.clear()
 
     def start_game_loop(self):
         "Start main game loop."
+
+        self.stdscr.addstr(self.game_state.get_sentence(), curses.A_LOW)
+        self.stdscr.move(0, 0)
+
         while True:
             key = self.stdscr.getkey()
 
@@ -69,7 +104,8 @@ class Game:
                         self.stdscr.addstr(
                             10,
                             0,
-                            "WPM: {}. Press any key to exit...".format(overall_wpm),
+                            "WPM: {}. Press any key to exit...".format(
+                                overall_wpm),
                         )
                         key = self.stdscr.getkey()
                         break
@@ -81,6 +117,7 @@ class Game:
 
 def main(stdscr):
     game = Game(stdscr)
+    game.play_start_animation()
     game.start_game_loop()
 
 

@@ -36,19 +36,24 @@ class Game:
         "Move to previous cursor position."
         if len(self.cursor_positions) > 0:
             previous_cursor_position = self.cursor_positions.pop()
+            # Displaying the bubbles is a hack fix for the bug where holding 
+            # backspace causes the cursor to get stuck at the beginning of 
+            # the previous line. I don't know why this works but it does... ¯\_(ツ)_/¯
             self.stdscr.addstr(10, 0, self.get_next_bubble_animation_frame())
             self.stdscr.move(previous_cursor_position[0], previous_cursor_position[1])
 
     def get_next_bubble_animation_frame(self):
+        "Return the next frame of a bubble animation sequence."
         bubbles = [".", "o", "O", "@", "*"]
-
         self.bubble_frame_index += 1
+
         if self.bubble_frame_index >= len(bubbles):
             self.bubble_frame_index = 0
 
         return bubbles[self.bubble_frame_index]
 
     def play_start_animation(self):
+        "Play the WPPM animation and clear the screen when finished."
         frames = [
             ":::       :::::::::::: :::::::::   :::   :::",
             "+:       :+::+:    :+::+:    :+: :+:+: :+:+:",

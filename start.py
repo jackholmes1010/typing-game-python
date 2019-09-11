@@ -42,8 +42,7 @@ class Game:
             # backspace causes the cursor to get stuck at the beginning of
             # the previous line. I don't know why this works but it does... ¯\_(ツ)_/¯
             self.add_str(self.get_next_bubble_animation_frame(), y=10, x=0)
-            self.stdscr.move(
-                previous_cursor_position[0], previous_cursor_position[1])
+            self.stdscr.move(previous_cursor_position[0], previous_cursor_position[1])
 
     def get_next_bubble_animation_frame(self):
         "Return the next frame of a bubble animation sequence."
@@ -84,7 +83,7 @@ class Game:
             curses.napms(20)
             self.add_str("::", y=y + 1, x=start_x + i)
             self.stdscr.refresh()
-        
+
         self.add_str("Press any key to start", y=y + 2, x=start_x + 6)
         self.stdscr.getkey()
         curses.curs_set(True)
@@ -96,14 +95,12 @@ class Game:
             self.metrics_counter.increment_correct_character_count()
 
         current_wpm = self.metrics_counter.current_wpm()
-        self.add_str("WPM: {}".format(current_wpm),
-                     y=10, x=2, move_cursor=False)
+        self.add_str("WPM: {}".format(current_wpm), y=10, x=2, move_cursor=False)
 
     def display_overall_wpm(self):
         "Update overall WPM display."
         overall_wpm = self.metrics_counter.overall_wpm()
-        self.add_str("WPM: {}. Press any key to exit...".format(
-            overall_wpm), y=10, x=2)
+        self.add_str("WPM: {}. Press any key to exit...".format(overall_wpm), y=10, x=2)
         self.stdscr.getkey()
 
     def add_str(self, text, y=None, x=None, attr=curses.A_NORMAL, move_cursor=True):

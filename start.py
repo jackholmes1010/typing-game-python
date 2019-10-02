@@ -124,7 +124,7 @@ class Game:
         while True:
             key = self.stdscr.getkey()
 
-            if key == "KEY_BACKSPACE":
+            if key == "KEY_BACKSPACE" or key == '\x7f':
                 if len(self.cursor_positions) < 1:
                     continue
 
@@ -135,7 +135,10 @@ class Game:
 
                 self.add_str(result, move_cursor=False)
                 self.update_current_wpm(correctly_typed=False)
-            else:
+            elif len(key) == 1:
+                if (key == '\n'):
+                    continue
+
                 result = self.game_state.process_key(key)
 
                 # Save current cursor position to support backspacing
